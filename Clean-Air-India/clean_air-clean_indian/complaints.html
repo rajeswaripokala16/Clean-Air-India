@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complaint Tracking | Clean India</title>
+
+    <script
+      src="https://kit.fontawesome.com/a076d05399.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      :root {
+        --good: #2ecc71;
+        --moderate: #f1c40f;
+        --poor: #e67e22;
+        --blue: #3498db;
+        --glass: #ffffff;
+        --text: #2c3e50;
+        --primary: #27ae60;
+        --secondary: #1abc9c;
+        --bg: #f4f6f9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          Poppins,
+          Segoe UI,
+          Arial,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      /* ================= HEADER ================= */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--glass);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1200;
+      }
+
+      .hamburger {
+        position: absolute;
+        left: 16px;
+        font-size: 26px;
+        cursor: pointer;
+        display: none;
+      }
+
+      /* ================= SIDEBAR ================= */
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 60px);
+        background: var(--glass);
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+        z-index: 1100;
+      }
+
+      .sidebar h3 {
+        margin-top: 0;
+        color: var(--good);
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #444;
+        border-radius: 10px;
+        font-weight: 500;
+      }
+
+      .sidebar a:hover,
+      .sidebar a.active {
+        background: var(--good);
+        color: #fff;
+      }
+
+      /* ================= MAIN ================= */
+      .main {
+        margin-left: 240px;
+        padding: 90px 20px 20px;
+        transition: 0.3s;
+      }
+
+      /* ================= HERO ================= */
+      .hero {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        padding: 30px 20px;
+        border-radius: 16px;
+        margin-bottom: 20px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 2rem;
+      }
+      .hero p {
+        margin-top: 8px;
+        font-weight: 500;
+        opacity: 0.9;
+      }
+
+      /* ================= FILTERS ================= */
+      .filters {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .filters button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        background: #fff;
+        color: var(--text);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .filters button.active {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+      }
+
+      /* ================= CARD ================= */
+      .card {
+        background: var(--glass);
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        overflow-x: auto;
+        margin-bottom: 20px;
+      }
+
+      /* ================= TABLE ================= */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        text-align: left;
+      }
+
+      th {
+        background: #f1f6f9;
+        color: #555;
+      }
+
+      tr:not(:last-child) {
+        border-bottom: 1px solid #eee;
+      }
+
+      /* ================= STATUS ================= */
+      .status {
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .Submitted {
+        background: var(--moderate);
+        color: #fff;
+      }
+      .InProgress {
+        background: var(--blue);
+        color: #fff;
+      }
+      .Resolved {
+        background: var(--good);
+        color: #fff;
+      }
+
+      /* ================= FOOTER ================= */
+      footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        color: #777;
+        font-size: 0.9rem;
+      }
+
+      /* ================= MOBILE ================= */
+      @media (max-width: 900px) {
+        .hamburger {
+          display: block;
+        }
+        .sidebar {
+          left: -260px;
+          top: 0;
+          height: 100%;
+        }
+        .sidebar.active {
+          left: 0;
+        }
+        .main {
+          margin-left: 0;
+          padding: 80px 16px 20px;
+        }
+        .hero {
+          padding: 20px;
+        }
+        .hero h1 {
+          font-size: 1.6rem;
+        }
+        .filters {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div class="header">
+      <div class="hamburger" onclick="toggleSidebar()">☰</div>
+      Clean Air & Clean India
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <h3>🌿 Clean India</h3>
+      <a href="index.html">Dashboard</a>
+      <a href="air_quality.html">AQI Monitor</a>
+      <a href="waste_tracker.html">Waste Management</a>
+      <a href="report.html">Report Issue</a>
+      <a href="admin.html">Admin</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="hero">
+        <h1>Complaint Tracking</h1>
+        <p>Track and manage your reported environmental issues</p>
+      </div>
+
+      <div class="filters">
+        <button class="active" onclick="loadComplaints('All', this)">
+          All
+        </button>
+        <button onclick="loadComplaints('Submitted', this)">Submitted</button>
+        <button onclick="loadComplaints('In Progress', this)">
+          In Progress
+        </button>
+        <button onclick="loadComplaints('Resolved', this)">Resolved</button>
+      </div>
+
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Issue</th>
+              <th>Description</th>
+              <th>Location</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="complaintTable"></tbody>
+        </table>
+      </div>
+
+      <footer>
+        <span>© 2026 Clean Air & Clean India</span>
+        <span>Smart City | Digital India</span>
+      </footer>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDsCAbnAUREdEOWZra_xNxoq_9hz3ddk6s",
+        authDomain: "clean-air--clean-india.firebaseapp.com",
+        databaseURL:
+          "https://clean-air--clean-india-default-rtdb.firebaseio.com",
+        projectId: "clean-air--clean-india",
+        storageBucket: "clean-air--clean-india.appspot.com",
+        messagingSenderId: "1071466903721",
+        appId: "1:1071466903721:web:f2831db13626450bff51b8",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+    </script>
+
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+
+      function loadComplaints(filter = "All", btn = null) {
+        document
+          .querySelectorAll(".filters button")
+          .forEach((b) => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+
+        const table = document.getElementById("complaintTable");
+        table.innerHTML = "";
+
+        database.ref("complaints").on("value", (snapshot) => {
+          table.innerHTML = "";
+
+          snapshot.forEach((child) => {
+            const c = child.val();
+
+            if (filter !== "All" && c.status !== filter) return;
+
+            const statusClass = c.status.replace(" ", "");
+
+            table.innerHTML += `
+          <tr>
+            <td>${child.key.slice(-6)}</td>
+            <td>${c.type}</td>
+            <td>${c.description}</td>
+            <td>${c.location}</td>
+            <td>
+              <span class="status ${statusClass}">
+                ${c.status}
+              </span>
+            </td>
+          </tr>`;
+          });
+        });
+      }
+
+      loadComplaints("All");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clean Air & Clean India</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --good: #2ecc71;
+        --moderate: #f1c40f;
+        --poor: #e67e22;
+        --blue: #3498db;
+        --glass: #ffffff;
+        --text: #2c3e50;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Poppins,
+          Segoe UI,
+          Arial,
+          sans-serif;
+        background: #f4f6f9;
+        color: var(--text);
+      }
+
+      /* ================= HEADER ================= */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1200;
+      }
+
+      .hamburger {
+        position: absolute;
+        left: 16px;
+        font-size: 26px;
+        cursor: pointer;
+        display: none;
+      }
+
+      /* ================= SIDEBAR ================= */
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 60px);
+        background: #ffffff;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+        z-index: 1100;
+      }
+
+      .sidebar h3 {
+        margin-top: 0;
+        color: var(--good);
+      }
+
+      .sidebar a {
+        display: block;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        color: #444;
+        border-radius: 10px;
+        font-weight: 500;
+      }
+
+      .sidebar a:hover,
+      .sidebar a.active {
+        background: var(--good);
+        color: #fff;
+      }
+
+      /* ================= MAIN ================= */
+      .main {
+        margin-left: 240px;
+        padding: 90px 20px 20px;
+        transition: 0.3s;
+      }
+
+      /* ================= TOPBAR ================= */
+      .topbar {
+        background: #ffffff;
+        padding: 16px 20px;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .temp {
+        color: var(--blue);
+        font-weight: 600;
+      }
+
+      /* ================= GRID ================= */
+      .grid {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+
+      .full {
+        grid-column: 1/-1;
+      }
+
+      /* ================= CARD ================= */
+      .card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      /* AQI */
+      .hero {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+      }
+
+      .aqi {
+        font-size: 3.5rem;
+        margin: 0;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        background: var(--moderate);
+        font-weight: 700;
+      }
+
+      /* PROGRESS */
+      .track {
+        height: 14px;
+        background: #ddd;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .fill {
+        height: 100%;
+        width: 60%;
+        background: var(--moderate);
+      }
+
+      /* CITY */
+      .city {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+      }
+
+      .city-bar {
+        height: 8px;
+        background: #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+
+      .city-fill {
+        height: 100%;
+      }
+
+      /* ACTIONS */
+      .actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* CHART */
+      .chart-box {
+        height: 260px;
+      }
+
+      /* ================= MOBILE ================= */
+      @media (max-width: 900px) {
+        .hamburger {
+          display: block;
+        }
+        .sidebar {
+          left: -260px;
+        }
+        .sidebar.active {
+          left: 0;
+        }
+        .main {
+          margin-left: 0;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .header {
+          font-size: 1rem;
+          height: 55px;
+        }
+        .aqi {
+          font-size: 3rem;
+        }
+        .actions {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- HEADER -->
+    <div class="header">
+      <div class="hamburger" onclick="toggleSidebar()">☰</div>
+      Clean Air & Clean India
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <h3>🌿 Clean India</h3>
+      <a class="active">Dashboard</a>
+      <a href="air_quality.html">Live AQI</a>
+      <a href="waste_tracker.html">Waste Management</a>
+      <a href="report.html">Report Issue</a>
+      <a href="complaints.html">Complaints</a>
+      <a href="admin.html">Admin</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <h3 style="margin: 0">Smart City Environment</h3>
+          <small id="datetime"></small>
+        </div>
+        <div class="temp">🌡️ 23°C | Bengaluru</div>
+      </div>
+
+      <div class="grid">
+        <div class="card full">
+          <div class="hero">
+            <div>
+              <small>LIVE AQI</small>
+              <h1 class="aqi">112</h1>
+              <div class="badge">Moderate</div>
+            </div>
+            <div style="max-width: 400px; width: 100%">
+              <div class="track"><div class="fill"></div></div>
+              <small>Good → Moderate → Poor</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Major Cities AQI</h3>
+          <div class="city"><span>Delhi</span><span>230</span></div>
+          <div class="city-bar">
+            <div
+              class="city-fill"
+              style="width: 80%; background: var(--poor)"
+            ></div>
+          </div>
+
+          <div class="city"><span>Mumbai</span><span>96</span></div>
+          <div class="city-bar">
+            <div
+              class="city-fill"
+              style="width: 45%; background: var(--moderate)"
+            ></div>
+          </div>
+
+          <div class="city"><span>Bengaluru</span><span>42</span></div>
+          <div class="city-bar">
+            <div
+              class="city-fill"
+              style="width: 20%; background: var(--good)"
+            ></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Health Advisory</h3>
+          <p>😷 Use masks outdoors</p>
+          <p>⚠ Reduce long travel</p>
+        </div>
+
+        <div class="card">
+          <h3>Quick Actions</h3>
+          <div class="actions">
+            <a href="air_quality.html"
+              ><button class="btn" style="background: var(--good)">
+                Check AQI
+              </button></a
+            >
+            <a href="report.html"
+              ><button class="btn" style="background: var(--moderate)">
+                Report Issue
+              </button></a
+            >
+            <a href="complaints.html"
+              ><button class="btn" style="background: var(--blue)">
+                Complaints
+              </button></a
+            >
+            <a href="admin.html"
+              ><button class="btn" style="background: var(--poor)">
+                Admin
+              </button></a
+            >
+          </div>
+        </div>
+
+        <div class="card full">
+          <h3>Pollution Trend</h3>
+          <div class="chart-box"><canvas id="chart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+
+      /* DATE & TIME */
+      function updateDateTime() {
+        const now = new Date();
+        document.getElementById("datetime").innerText = now.toLocaleString(
+          "en-IN",
+          {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          },
+        );
+      }
+      setInterval(updateDateTime, 1000);
+      updateDateTime();
+
+      /* CHART */
+      new Chart(document.getElementById("chart"), {
+        type: "line",
+        data: {
+          labels: ["08", "10", "12", "14", "16", "18"],
+          datasets: [
+            {
+              data: [105, 110, 112, 118, 114, 108],
+              borderColor: "#f1c40f",
+              borderWidth: 3,
+              fill: true,
+              backgroundColor: "rgba(241,196,15,.25)",
+              tension: 0.4,
+              pointRadius: 4,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { x: { grid: { display: false } }, y: { display: false } },
+        },
+      });
+    </script>
+  </body>
+</html>

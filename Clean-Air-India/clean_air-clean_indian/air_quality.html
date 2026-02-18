@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart AQI Dashboard | Clean India</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --good:#2ecc71;
+  --moderate:#f1c40f;
+  --poor:#e67e22;
+  --unhealthy:#e74c3c;
+  --severe:#8e44ad;
+  --blue:#3498db;
+  --glass:#ffffff;
+  --text:#2c3e50;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Poppins,Segoe UI,Arial,sans-serif;
+  background:#f4f6f9;
+  color:var(--text);
+}
+
+/* HEADER */
+.header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:60px;
+  background:var(--glass);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.2rem;
+  font-weight:600;
+  box-shadow:0 2px 10px rgba(0,0,0,.1);
+  z-index:1200;
+}
+
+.hamburger{
+  position:absolute;
+  left:16px;
+  font-size:26px;
+  cursor:pointer;
+  display:none;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:60px;
+  left:0;
+  width:240px;
+  height:calc(100vh - 60px);
+  background:var(--glass);
+  padding:20px;
+  box-shadow:2px 0 10px rgba(0,0,0,.08);
+  transition:0.3s;
+  z-index:1100;
+}
+
+.sidebar h3{
+  margin-top:0;
+  color:var(--good);
+}
+
+.sidebar a{
+  display:block;
+  padding:12px 14px;
+  margin-bottom:10px;
+  text-decoration:none;
+  color:#444;
+  border-radius:10px;
+  font-weight:500;
+}
+
+.sidebar a:hover,
+.sidebar a.active{
+  background:var(--good);
+  color:#fff;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:90px 20px 20px;
+  transition:0.3s;
+}
+
+/* TOPBAR */
+.topbar{
+  background:var(--glass);
+  padding:16px 20px;
+  border-radius:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.temp{
+  color:var(--blue);
+  font-weight:600;
+}
+
+/* GRID */
+.grid{
+  margin-top:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+
+.full{grid-column:1/-1}
+
+/* CARD */
+.card{
+  background:var(--glass);
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+/* HERO */
+.hero{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:20px;
+  background:linear-gradient(135deg,var(--good),var(--blue));
+  color:white;
+  padding:25px;
+  border-radius:18px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+}
+
+/* CITY AQI */
+.city{
+  display:flex;
+  flex-direction:column;
+  margin-bottom:15px;
+}
+
+.city-row{
+  display:flex;
+  justify-content:space-between;
+  font-weight:600;
+}
+
+.bar{
+  height:10px;
+  background:#ddd;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:5px;
+}
+
+.fill{
+  height:100%;
+  width:0;
+  background:white;
+  transition:1s;
+}
+
+/* HEALTH TIPS */
+.tips li{
+  margin-bottom:8px;
+}
+
+/* CHART */
+.chart-box{
+  height:260px;
+}
+
+/* ACTIONS */
+.actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.btn{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  color:white;
+  cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+  margin-top:25px;
+  display:flex;
+  justify-content:space-between;
+  color:#777;
+  font-size:.9rem;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+  .hamburger{display:block;}
+  .sidebar{left:-260px;}
+  .sidebar.active{left:0;}
+  .main{margin-left:0;}
+}
+
+@media(max-width:600px){
+  .header{font-size:1rem;height:55px;}
+  .hero h1{font-size:1.7rem;}
+  .actions{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hamburger" onclick="toggleSidebar()">☰</div>
+  Smart AQI Dashboard | Clean India
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <h3>🌿 Clean India</h3>
+  <a class="active" href="index.html">Dashboard</a>
+  <a href="waste_tracker.html">Waste Management</a>
+  <a href="complaints.html">Complaints</a>
+  <a href="report.html">Reports</a>
+  <a href="admin.html">Admin</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="topbar">
+  <div>
+    <h3 style="margin:0">City AQI Overview</h3>
+    <small id="datetime"></small>
+  </div>
+  <div class="temp">🌡️ 23°C | Bengaluru</div>
+</div>
+
+<div class="grid">
+
+<!-- HERO CARD -->
+<div class="card full hero">
+  <div>
+    <h1>Smart Air Quality Dashboard</h1>
+    <p>City-wise AQI visualization based on CPCB standards</p>
+  </div>
+</div>
+
+<!-- CITY AQI CARD -->
+<div class="card" id="aqiCard"></div>
+
+<!-- HEALTH ADVISORY -->
+<div class="card">
+  <h3>Health Advisory</h3>
+  <ul class="tips" id="tips"></ul>
+</div>
+
+<!-- POLLUTION TREND CHART -->
+<div class="card full">
+  <h3>Pollution Trend</h3>
+  <div class="chart-box"><canvas id="chart"></canvas></div>
+</div>
+
+</div>
+
+<footer>
+  <span>📊 Updated hourly</span>
+  <span>🏛 CPCB India</span>
+</footer>
+
+</div>
+
+<script>
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+/* DATE & TIME */
+function updateDateTime(){
+  const now = new Date();
+  document.getElementById("datetime").innerText =
+    now.toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
+/* AQI DATA */
+const cities = [
+ {name:"Delhi",aqi:230},
+ {name:"Mumbai",aqi:96},
+ {name:"Bengaluru",aqi:42},
+ {name:"Chennai",aqi:78},
+ {name:"Kolkata",aqi:180},
+ {name:"Hyderabad",aqi:88},
+ {name:"Pune",aqi:64},
+ {name:"Ahmedabad",aqi:210},
+ {name:"Jaipur",aqi:165},
+ {name:"Lucknow",aqi:195}
+];
+
+function info(aqi){
+ if(aqi<=50) return ["Good","var(--good)","Safe for all 😊"];
+ if(aqi<=100) return ["Moderate","var(--moderate)","Sensitive groups cautious 😐"];
+ if(aqi<=200) return ["Poor","var(--poor)","Reduce outdoor activity 😷"];
+ if(aqi<=300) return ["Unhealthy","var(--unhealthy)","Avoid outdoor exposure ⚠️"];
+ return ["Severe","var(--severe)","Health emergency 🚨"];
+}
+
+const aqiCard=document.getElementById("aqiCard");
+const tips=document.getElementById("tips");
+
+aqiCard.innerHTML="<h3>City-wise AQI</h3>";
+
+cities.forEach(c=>{
+ const [status,color,tip]=info(c.aqi);
+ const w=Math.min(c.aqi/2.5,100)+"%"; // scale width for bar
+
+ aqiCard.innerHTML+=`
+ <div class="city" style="background:${color};padding:12px 16px;border-radius:12px;color:white;">
+   <div class="city-row">
+     <span class="city-name">${c.name}</span>
+     <span class="aqi">${c.aqi}</span>
+   </div>
+   <div class="status">${status}</div>
+   <div class="bar"><div class="fill" style="width:${w};background:white;"></div></div>
+ </div>`;
+
+ tips.innerHTML+=`<li><strong>${c.name}:</strong> ${tip}</li>`;
+});
+
+/* POLLUTION TREND CHART */
+new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{
+    labels:["08","10","12","14","16","18"],
+    datasets:[{
+      data:[105,110,112,118,114,108],
+      borderColor:"#f1c40f",
+      borderWidth:3,
+      fill:true,
+      backgroundColor:"rgba(241,196,15,.25)",
+      tension:.4,
+      pointRadius:4
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{x:{grid:{display:false}},y:{display:false}}
+  }
+});
+</script>
+
+</body>
+</html>
